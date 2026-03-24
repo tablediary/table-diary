@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书桌日记</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wood-brown: #8B7355;
+            --paper-cream: #FFFEF5;
+            --sticky-yellow: #FFF8DC;
+            --card-bg: #FAF8F0;
+            --primary-brown: #8B5A2B;
+            --primary-brown-hover: #6B4423;
+            --text-primary: #4A3728;
+            --text-secondary: #9E9E9E;
+            --border-tan: #D4C4B0;
+            --shadow-light: rgba(139, 90, 43, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Noto Serif SC", "STSong", serif;
+            min-height: 100vh;
+            background: 
+                /* 木纹纹理层 */
+                repeating-linear-gradient(
+                    95deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(139, 90, 43, 0.02) 1px,
+                    rgba(139, 90, 43, 0.02) 2px
+                ),
+                repeating-linear-gradient(
+                    85deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(101, 67, 33, 0.03) 3px,
+                    rgba(101, 67, 33, 0.03) 6px
+                ),
+                repeating-linear-gradient(
+                    75deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(80, 52, 26, 0.02) 8px,
+                    rgba(80, 52, 26, 0.02) 16px
+                ),
+                /* 木纹年轮效果 */
+                repeating-radial-gradient(
+                    circle at 20% 30%,
+                    transparent 0%,
+                    rgba(139, 90, 43, 0.02) 10%,
+                    transparent 20%
+                ),
+                repeating-radial-gradient(
+                    circle at 80% 70%,
+                    transparent 0%,
+                    rgba(101, 67, 33, 0.02) 10%,
+                    transparent 20%
+                ),
+                /* 主色调 - 浅奶咖色背景 */
+                linear-gradient(180deg, #D4C4B0 0%, #C9B8A5 30%, #C4B5A0 60%, #B8A896 100%);
+            background-attachment: fixed;
+        }
+
+        /* Floating Clouds */
+        .clouds-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .cloud {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 50%, transparent 70%);
+            border-radius: 50px;
+            filter: blur(2px);
+            animation: floatCloud linear infinite;
+        }
+
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud::after {
+            width: 55px;
+            height: 55px;
+            top: -30px;
+            left: 30px;
+        }
+
+        @keyframes floatCloud {
+            from { transform: translateX(-120px); }
+            to { transform: translateX(calc(100vw + 120px)); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            color: #FFFEF5;
+            font-size: 28px;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 8px;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            background: var(--border-tan);
+            border-radius: 20px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .toggle-option {
+            padding: 8px 24px;
+            border-radius: 16px;
+            cursor: pointer;
+            color: #5D4E3A;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .toggle-option.active {
+            background: var(--primary-brown);
+            color: var(--paper-cream);
+        }
+
+        .date-picker-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .date-label {
+            color: #FFFEF5;
+            font-size: 14px;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 2px solid var(--border-tan);
+            border-radius: 8px;
+            background: #FFFEF5;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .date-input:hover {
+            border-color: var(--primary-brown);
+        }
+
+        .date-nav {
+            display: flex;
+            gap: 8px;
+            margin-left: 12px;
+        }
+
+        .date-nav-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-tan);
+            border-radius: 6px;
+            background: #FFFEF5;
+            color: #5D4E3A;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .date-nav-btn:hover {
+            background: var(--paper-cream);
+            border-color: var(--primary-brown);
+        }
+
+        .sticky-notes-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .sticky-note {
+            width: 180px;
+            min-height: 120px;
+            padding: 32px 16px 16px 40px;
+            background: var(--sticky-yellow);
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+            transform: rotate(-1deg);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        /* 胶带效果 */
+        .sticky-note::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 20px;
+            background: linear-gradient(180deg, #E8D78A 0%, #D4C36A 100%);
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .sticky-note:nth-child(even) {
+            transform: rotate(1deg);
+        }
+
+        .sticky-note:hover {
+            transform: rotate(0deg) scale(1.02);
+            z-index: 10;
+        }
+
+        .sticky-note .note-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .sticky-note .note-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .sticky-note .note-completed {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .sticky-note .note-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-tan);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: #FFFEF5;
+        }
+
+        .sticky-note .note-checkbox:hover {
+            border-color: var(--primary-brown);
+        }
+
+        .sticky-note .note-checkbox.checked {
+            background: var(--primary-brown);
+            border-color: var(--primary-brown);
+        }
+
+        .sticky-note .note-checkbox.checked::after {
+            content: '✓';
+            color: #FFFEF5;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .sticky-note .note-actions {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sticky-note:hover .note-actions {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .icon-btn svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--text-secondary);
+        }
+
+        .book-page {
+            background: var(--paper-cream);
+            border-radius: 8px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            min-height: 300px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .book-page::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(90deg, rgba(139,90,43,0.1) 0%, transparent 100%);
+        }
+
+        .page-title {
+            color: var(--primary-brown);
+            font-size: 20px;
+            margin-bottom: 24px;
+            padding-left: 24px;
+            border-bottom: 2px solid var(--border-tan);
+            padding-bottom: 12px;
+        }
+
+        .cards-container {
+            padding-left: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary-brown);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateX(4px);
+            box-shadow: 2px 2px 8px var(--shadow-light);
+        }
+
+        .card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .card .emotion-tag {
+            font-size: 16px;
+            padding: 2px 8px;
+            background: rgba(139, 90, 43, 0.1);
+            border-radius: 12px;
+        }
+
+        .card .card-content {
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .card .card-content.font-1 {
+            font-family: "Ma Shan Zheng", cursive;
+            font-size: 18px;
+        }
+
+        .card .card-content.font-2 {
+            font-family: "Zhi Mang Xing", cursive;
+            font-size: 18px;
+        }
+
+        .card .card-content.font-3 {
+            font-family: "Noto Serif SC", serif;
+            font-style: italic;
+        }
+
+        .card .card-content.font-4 {
+            font-family: "Noto Serif SC", serif;
+        }
+
+        .card .card-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .card .card-image {
+            max-width: 200px;
+            border-radius: 4px;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+            transform: rotate(-1deg);
+            transition: transform 0.3s;
+        }
+
+        .card .card-image:nth-child(even) {
+            transform: rotate(1deg);
+        }
+
+        .card .card-image:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        .card .card-timestamp {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .card .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px;
+            font-style: italic;
+        }
+
+        .input-area {
+            background: var(--paper-cream);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .input-row {
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .label {
+            display: block;
+            color: var(--primary-brown);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .text-input, .textarea-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-tan);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: #FFFEF5;
+            transition: border-color 0.3s;
+        }
+
+        .text-input:focus, .textarea-input:focus {
+            outline: none;
+            border-color: var(--primary-brown);
+        }
+
+        .textarea-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .memo-input-fields {
+            display: none;
+        }
+
+        .memo-input-fields.visible {
+            display: block;
+        }
+
+        .time-input {
+            padding: 10px 12px;
+            border: 2px solid var(--border-tan);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: #FFFEF5;
+        }
+
+        .options-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .option-label {
+            display: block;
+            color: var(--primary-brown);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .font-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .font-option {
+            padding: 8px 16px;
+            border: 2px solid var(--border-tan);
+            border-radius: 8px;
+            background: #FFFEF5;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .font-option:hover {
+            border-color: var(--primary-brown);
+        }
+
+        .font-option.active {
+            border-color: var(--primary-brown);
+            background: var(--primary-brown);
+            color: #FFFEF5;
+        }
+
+        .font-option.font-1 {
+            font-family: "Ma Shan Zheng", cursive;
+        }
+
+        .font-option.font-2 {
+            font-family: "Zhi Mang Xing", cursive;
+        }
+
+        .font-option.font-3 {
+            font-family: "Noto Serif SC", serif;
+            font-style: italic;
+        }
+
+        .font-option.font-4 {
+            font-family: "Noto Serif SC", serif;
+        }
+
+        .emotion-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .emotion-option {
+            padding: 6px 12px;
+            border: 2px solid var(--border-tan);
+            border-radius: 20px;
+            background: #FFFEF5;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .emotion-option:hover {
+            border-color: var(--primary-brown);
+        }
+
+        .emotion-option.active {
+            border-color: var(--primary-brown);
+            background: var(--primary-brown);
+            color: #FFFEF5;
+        }
+
+        .image-upload-area {
+            border: 2px dashed var(--border-tan);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 16px;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary-brown);
+            background: rgba(139, 90, 43, 0.05);
+        }
+
+        .image-upload-area input {
+            display: none;
+        }
+
+        .image-upload-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .image-upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .preview-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .preview-image {
+            position: relative;
+            max-width: 150px;
+        }
+
+        .preview-image img {
+            width: 100%;
+            border-radius: 4px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .preview-image .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-brown);
+            color: #FFFEF5;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-brown-hover);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--paper-cream);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            color: var(--primary-brown);
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-brown);
+            color: #FFFEF5;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-brown-hover);
+        }
+
+        .btn-secondary {
+            background: var(--border-tan);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: #FFFEF5;
+        }
+
+        .btn-danger:hover {
+            background: #ee5a5a;
+        }
+
+        /* Reminder Modal */
+        .reminder-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--sticky-yellow);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 200;
+            max-width: 350px;
+            width: 90%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .reminder-modal .reminder-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .reminder-modal .reminder-content {
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .reminder-modal .reminder-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Clouds -->
+    <div class="clouds-container" id="cloudsContainer"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">书桌日记</h1>
+            <div class="toggle-container">
+                <div class="toggle-switch" id="typeToggle">
+                    <span class="toggle-option active" data-type="essay">随笔</span>
+                    <span class="toggle-option" data-type="memo">备忘录</span>
+                </div>
+            </div>
+            <div class="date-picker-container">
+                <span class="date-label">日期：</span>
+                <input type="date" class="date-input" id="datePicker">
+                <div class="date-nav">
+                    <button class="date-nav-btn" onclick="changeDate(-1)">上一天</button>
+                    <button class="date-nav-btn" onclick="changeDate(1)">下一天</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="sticky-notes-area" id="stickyNotesArea"></div>
+
+        <div class="input-area" id="inputArea">
+            <div class="options-row" id="essayOptions" style="display: none;">
+                <div class="option-group">
+                    <span class="option-label">字体风格</span>
+                    <div class="font-selector" id="fontSelector">
+                        <span class="font-option font-1" data-font="font-1" style="font-family: 'Ma Shan Zheng', cursive;">手写体1</span>
+                        <span class="font-option font-2" data-font="font-2" style="font-family: 'Zhi Mang Xing', cursive;">手写体2</span>
+                        <span class="font-option font-3" data-font="font-3" style="font-family: 'Noto Serif SC', serif; font-style: italic;">斜体</span>
+                        <span class="font-option font-4 active" data-font="font-4" style="font-family: 'Noto Serif SC', serif;">默认</span>
+                    </div>
+                </div>
+                <div class="option-group">
+                    <span class="option-label">情绪标签</span>
+                    <div class="emotion-selector" id="emotionSelector">
+                        <span class="emotion-option" data-emotion="😀">😀 开心</span>
+                        <span class="emotion-option" data-emotion="😌">😌 平静</span>
+                        <span class="emotion-option" data-emotion="😔">😔 难过</span>
+                        <span class="emotion-option" data-emotion="😤">😤 烦躁</span>
+                        <span class="emotion-option" data-emotion="😢">😢 哭泣</span>
+                        <span class="emotion-option" data-emotion="🤗">🤗 温暖</span>
+                        <span class="emotion-option" data-emotion="😴">😴 疲惫</span>
+                        <span class="emotion-option" data-emotion="🤔">🤔 思考</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-upload-area" id="imageUploadArea" style="display: none;">
+                <input type="file" id="imageInput" accept="image/*" multiple>
+                <div class="image-upload-icon">📷</div>
+                <div class="image-upload-text">点击添加图片（可多选）</div>
+                <div class="preview-images" id="previewImages"></div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="label" id="contentLabel">内容</label>
+                    <textarea class="textarea-input" id="contentInput" placeholder="时间留不住的，用文字记录"></textarea>
+                </div>
+            </div>
+            <div class="memo-input-fields" id="memoInputFields">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label class="label">开始时间</label>
+                        <input type="datetime-local" class="time-input" id="startTimeInput">
+                    </div>
+                    <div class="input-group">
+                        <label class="label">提醒时间</label>
+                        <input type="datetime-local" class="time-input" id="reminderTimeInput">
+                    </div>
+                </div>
+            </div>
+            <button class="submit-btn" id="submitBtn">添加记录</button>
+        </div>
+
+        <div class="book-page">
+            <h2 class="page-title" id="pageTitle">今日随笔</h2>
+            <div class="cards-container" id="cardsContainer"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="editModalTitle">编辑随笔</h3>
+            <div class="input-group">
+                <label class="label">内容</label>
+                <textarea class="textarea-input" id="editContentInput"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="editSaveBtn">保存</button>
+                <button class="btn btn-danger" id="editDeleteBtn">删除</button>
+                <button class="btn btn-secondary" id="editCancelBtn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div class="reminder-modal" id="reminderModal" style="display: none;">
+        <div class="reminder-title">⏰ 提醒</div>
+        <div class="reminder-content" id="reminderContent"></div>
+        <div class="reminder-time" id="reminderTime"></div>
+        <button class="btn btn-primary" id="reminderCloseBtn" style="margin-top: 12px; width: 100%;">知道了</button>
+    </div>
+
+    <script>
+        // State
+        let records = JSON.parse(localStorage.getItem('deskDiaryRecords')) || {};
+        let currentDate = new Date().toISOString().split('T')[0];
+        let currentType = 'essay';
+        let editingId = null;
+        let selectedFont = 'font-4';
+        let selectedEmotion = '';
+        let previewImageFiles = [];
+
+        // Elements
+        const typeToggle = document.getElementById('typeToggle');
+        const datePicker = document.getElementById('datePicker');
+        const stickyNotesArea = document.getElementById('stickyNotesArea');
+        const bookPage = document.querySelector('.book-page');
+        const pageTitle = document.getElementById('pageTitle');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const contentLabel = document.getElementById('contentLabel');
+        const contentInput = document.getElementById('contentInput');
+        const memoInputFields = document.getElementById('memoInputFields');
+        const startTimeInput = document.getElementById('startTimeInput');
+        const reminderTimeInput = document.getElementById('reminderTimeInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const editModal = document.getElementById('editModal');
+        const editModalTitle = document.getElementById('editModalTitle');
+        const editContentInput = document.getElementById('editContentInput');
+        const editSaveBtn = document.getElementById('editSaveBtn');
+        const editDeleteBtn = document.getElementById('editDeleteBtn');
+        const editCancelBtn = document.getElementById('editCancelBtn');
+        const reminderModal = document.getElementById('reminderModal');
+        const reminderContent = document.getElementById('reminderContent');
+        const reminderTime = document.getElementById('reminderTime');
+        const reminderCloseBtn = document.getElementById('reminderCloseBtn');
+        const essayOptions = document.getElementById('essayOptions');
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const fontSelector = document.getElementById('fontSelector');
+        const emotionSelector = document.getElementById('emotionSelector');
+        const imageInput = document.getElementById('imageInput');
+        const previewImages = document.getElementById('previewImages');
+
+        // Initialize clouds
+        function createClouds() {
+            const container = document.getElementById('cloudsContainer');
+            const cloudCount = 8;
+            const lanes = [
+                { top: '10%', duration: 45 },
+                { top: '20%', duration: 55 },
+                { top: '30%', duration: 50 },
+                { top: '40%', duration: 60 },
+                { top: '50%', duration: 48 },
+                { top: '60%', duration: 52 },
+                { top: '70%', duration: 58 },
+                { top: '80%', duration: 42 }
+            ];
+
+            for (let i = 0; i < cloudCount; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                const lane = lanes[i];
+                cloud.style.top = lane.top;
+                cloud.style.animationDuration = lane.duration + 's';
+                cloud.style.animationDelay = (i * -lane.duration / cloudCount) + 's';
+                cloud.style.opacity = 0.4 + Math.random() * 0.3;
+                container.appendChild(cloud);
+            }
+        }
+
+        // Initialize
+        function init() {
+            createClouds();
+            datePicker.value = currentDate;
+            // 便利贴始终显示
+            stickyNotesArea.style.display = 'flex';
+            bookPage.style.display = 'block';
+            render();
+            setupEventListeners();
+            startReminderCheck();
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Toggle switch
+            typeToggle.addEventListener('click', () => {
+                currentType = currentType === 'essay' ? 'memo' : 'essay';
+                typeToggle.classList.toggle('memo-active');
+                document.querySelectorAll('.toggle-option').forEach(opt => {
+                    opt.classList.toggle('active');
+                });
+                updateInputArea();
+                render();
+            });
+
+            // Date picker
+            datePicker.addEventListener('change', (e) => {
+                currentDate = e.target.value;
+                render();
+            });
+
+            // Change date
+            window.changeDate = function(days) {
+                const date = new Date(currentDate);
+                date.setDate(date.getDate() + days);
+                currentDate = date.toISOString().split('T')[0];
+                datePicker.value = currentDate;
+                render();
+            };
+
+            // Font selector
+            fontSelector.addEventListener('click', (e) => {
+                if (e.target.classList.contains('font-option')) {
+                    document.querySelectorAll('.font-option').forEach(opt => opt.classList.remove('active'));
+                    e.target.classList.add('active');
+                    selectedFont = e.target.dataset.font;
+                }
+            });
+
+            // Emotion selector
+            emotionSelector.addEventListener('click', (e) => {
+                if (e.target.classList.contains('emotion-option')) {
+                    const wasActive = e.target.classList.contains('active');
+                    document.querySelectorAll('.emotion-option').forEach(opt => opt.classList.remove('active'));
+                    if (!wasActive) {
+                        e.target.classList.add('active');
+                        selectedEmotion = e.target.dataset.emotion;
+                    } else {
+                        selectedEmotion = '';
+                    }
+                }
+            });
+
+            // Image upload
+            imageUploadArea.addEventListener('click', () => {
+                imageInput.click();
+            });
+
+            imageInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            previewImageFiles.push(e.target.result);
+                            renderPreviewImages();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                imageInput.value = '';
+            });
+
+            // Submit button
+            submitBtn.addEventListener('click', addRecord);
+
+            // Edit modal
+            editCancelBtn.addEventListener('click', closeEditModal);
+            editSaveBtn.addEventListener('click', saveEdit);
+            editDeleteBtn.addEventListener('click', deleteRecord);
+            editModal.addEventListener('click', (e) => {
+                if (e.target === editModal) closeEditModal();
+            });
+
+            // Reminder modal
+            reminderCloseBtn.addEventListener('click', () => {
+                reminderModal.style.display = 'none';
+            });
+        }
+
+        function renderPreviewImages() {
+            previewImages.innerHTML = previewImageFiles.map((src, index) => `
+                <div class="preview-image">
+                    <img src="${src}" alt="预览">
+                    <button class="remove-btn" onclick="removePreviewImage(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        window.removePreviewImage = function(index) {
+            previewImageFiles.splice(index, 1);
+            renderPreviewImages();
+        };
+
+        // Update input area based on type
+        function updateInputArea() {
+            if (currentType === 'memo') {
+                contentLabel.textContent = '备忘录内容';
+                memoInputFields.classList.add('visible');
+                pageTitle.textContent = '备忘录';
+                essayOptions.style.display = 'none';
+                imageUploadArea.style.display = 'none';
+                stickyNotesArea.style.display = 'flex';
+                bookPage.style.display = 'none';
+            } else {
+                contentLabel.textContent = '随笔内容';
+                memoInputFields.classList.remove('visible');
+                pageTitle.textContent = '今日随笔';
+                essayOptions.style.display = 'flex';
+                imageUploadArea.style.display = 'block';
+                // 便利贴始终显示
+                stickyNotesArea.style.display = 'flex';
+                bookPage.style.display = 'block';
+            }
+        }
+
+        // Generate ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Format date
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Save records
+        function saveRecords() {
+            localStorage.setItem('deskDiaryRecords', JSON.stringify(records));
+        }
+
+        // Add record
+        function addRecord() {
+            const content = contentInput.value.trim();
+            if (!content && previewImageFiles.length === 0) {
+                return;
+            }
+
+            if (!records[currentDate]) {
+                records[currentDate] = { essays: [], memos: [] };
+            }
+
+            const record = {
+                id: generateId(),
+                content: content,
+                createdAt: new Date().toISOString()
+            };
+
+            if (currentType === 'memo') {
+                record.startTime = startTimeInput.value;
+                record.reminderTime = reminderTimeInput.value;
+                record.completed = false; // 初始化完成状态
+                records[currentDate].memos.push(record);
+            } else {
+                record.font = selectedFont;
+                record.emotion = selectedEmotion;
+                record.images = [...previewImageFiles];
+                records[currentDate].essays.push(record);
+            }
+
+            saveRecords();
+            contentInput.value = '';
+            startTimeInput.value = '';
+            reminderTimeInput.value = '';
+            selectedEmotion = '';
+            previewImageFiles = [];
+            document.querySelectorAll('.emotion-option').forEach(opt => opt.classList.remove('active'));
+            renderPreviewImages();
+            render();
+        }
+
+        // Open edit modal
+        function openEditModal(id) {
+            editingId = id;
+            const dateRecords = records[currentDate];
+            
+            if (currentType === 'essay') {
+                const essay = dateRecords.essays.find(e => e.id === id);
+                if (essay) {
+                    editModalTitle.textContent = '编辑随笔';
+                    editContentInput.value = essay.content;
+                }
+            } else {
+                const memo = dateRecords.memos.find(m => m.id === id);
+                if (memo) {
+                    editModalTitle.textContent = '编辑备忘录';
+                    editContentInput.value = memo.content;
+                }
+            }
+            
+            editModal.classList.add('visible');
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            editModal.classList.remove('visible');
+            editingId = null;
+        }
+
+        // Save edit
+        function saveEdit() {
+            const content = editContentInput.value.trim();
+            if (!content) return;
+
+            const dateRecords = records[currentDate];
+            
+            if (currentType === 'essay') {
+                const essay = dateRecords.essays.find(e => e.id === editingId);
+                if (essay) {
+                    essay.content = content;
+                }
+            } else {
+                const memo = dateRecords.memos.find(m => m.id === editingId);
+                if (memo) {
+                    memo.content = content;
+                }
+            }
+
+            saveRecords();
+            closeEditModal();
+            render();
+        }
+
+        // Delete record
+        function deleteRecord() {
+            const dateRecords = records[currentDate];
+            
+            if (currentType === 'essay') {
+                dateRecords.essays = dateRecords.essays.filter(e => e.id !== editingId);
+            } else {
+                dateRecords.memos = dateRecords.memos.filter(m => m.id !== editingId);
+            }
+
+            saveRecords();
+            closeEditModal();
+            render();
+        }
+
+        // Render sticky notes (memos) - 始终显示备忘录
+        function renderStickyNotes() {
+            const dateRecords = records[currentDate];
+
+            if (!dateRecords || !dateRecords.memos || dateRecords.memos.length === 0) {
+                stickyNotesArea.innerHTML = '<div class="empty-state" style="color: #FFFEF5;">今日还没有备忘录</div>';
+                return;
+            }
+
+            stickyNotesArea.innerHTML = dateRecords.memos.map(memo => `
+                <div class="sticky-note">
+                    <div class="note-checkbox ${memo.completed ? 'checked' : ''}" onclick="toggleMemoCompleted('${memo.id}')"></div>
+                    <div class="note-content ${memo.completed ? 'note-completed' : ''}">${escapeHtml(memo.content)}</div>
+                    <div class="note-time">${memo.startTime ? '开始: ' + memo.startTime.replace('T', ' ') : ''}</div>
+                    <div class="note-actions">
+                        <button class="icon-btn" title="编辑" onclick="openEditModal('${memo.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button class="icon-btn" title="删除" onclick="confirmDeleteMemo('${memo.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render cards (essays)
+        function renderCards() {
+            const dateRecords = records[currentDate];
+            
+            if (currentType === 'memo') {
+                cardsContainer.innerHTML = '<div class="empty-state">备忘录已显示在上方的便利贴区域</div>';
+                return;
+            }
+
+            if (!dateRecords || !dateRecords.essays || dateRecords.essays.length === 0) {
+                cardsContainer.innerHTML = '<div class="empty-state">今日还没有随笔，点击上方输入框记录你的想法吧~</div>';
+                return;
+            }
+
+            // Sort by creation time, newest first
+            const sortedEssays = [...dateRecords.essays].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            cardsContainer.innerHTML = sortedEssays.map(essay => `
+                <div class="card">
+                    ${essay.emotion ? `<div class="card-header"><span class="emotion-tag">${essay.emotion}</span></div>` : ''}
+                    <div class="card-content ${essay.font || ''}">${escapeHtml(essay.content)}</div>
+                    ${essay.images && essay.images.length > 0 ? `
+                        <div class="card-images">
+                            ${essay.images.map(img => `<img class="card-image" src="${img}" alt="随笔图片">`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="card-timestamp">${formatDate(essay.createdAt)}</div>
+                    <div class="card-actions">
+                        <button class="icon-btn" title="编辑" onclick="openEditModal('${essay.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button class="icon-btn" title="删除" onclick="confirmDeleteEssay('${essay.id}')">
+                            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Confirm delete memo
+        function confirmDeleteMemo(id) {
+            editingId = id;
+            currentType = 'memo';
+            deleteRecord();
+        }
+
+        // Confirm delete essay
+        function confirmDeleteEssay(id) {
+            editingId = id;
+            currentType = 'essay';
+            deleteRecord();
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render all
+        function render() {
+            renderStickyNotes();
+            renderCards();
+        }
+
+        // Reminder check
+        function startReminderCheck() {
+            setInterval(() => {
+                const now = new Date();
+                const currentKey = now.toISOString().slice(0, 16);
+                
+                Object.keys(records).forEach(date => {
+                    if (records[date] && records[date].memos) {
+                        records[date].memos.forEach(memo => {
+                            if (memo.reminderTime && memo.reminderTime.slice(0, 16) === currentKey) {
+                                showReminder(memo);
+                            }
+                        });
+                    }
+                });
+            }, 60000);
+        }
+
+        function showReminder(memo) {
+            if (reminderModal.style.display === 'none') {
+                reminderContent.textContent = memo.content;
+                reminderTime.textContent = memo.reminderTime.replace('T', ' ');
+                reminderModal.style.display = 'block';
+            }
+        }
+
+        // Toggle memo completed status
+        function toggleMemoCompleted(id) {
+            const dateRecords = records[currentDate];
+            if (dateRecords && dateRecords.memos) {
+                const memo = dateRecords.memos.find(m => m.id === id);
+                if (memo) {
+                    memo.completed = !memo.completed;
+                    saveRecords();
+                    render();
+                }
+            }
+        }
+
+        // Make functions globally accessible
+        window.openEditModal = openEditModal;
+        window.confirmDeleteMemo = confirmDeleteMemo;
+        window.confirmDeleteEssay = confirmDeleteEssay;
+        window.toggleMemoCompleted = toggleMemoCompleted;
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
